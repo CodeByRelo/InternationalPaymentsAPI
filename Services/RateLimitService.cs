@@ -4,7 +4,7 @@ public class RateLimitService
 {
     private static readonly ConcurrentDictionary<string, int> Attempts = new();
 
-    private const int MAX_ATTEMPTS = 5;
+    private const int MAX_ATTEMPTS = 5; // number of allowed attempts before blocking
 
     public bool IsBlocked(string key)
     {
