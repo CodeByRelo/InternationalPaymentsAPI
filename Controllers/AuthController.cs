@@ -47,26 +47,13 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDTO dto)
     {
-        // 🔐 Password validation (already added earlier)
+        // 🔐 PASSWORD SECURITY CHECK
         var passwordError = ValidatePassword(dto.Password);
         if (passwordError != null)
             return BadRequest(passwordError);
 
-        // Create user
         var user = await _auth.Register(dto);
-
-        // 🔥 AUTO LOGIN: generate token immediately making sure that the user is auto-logged in after registration
-        var token = _auth.Login(new LoginDTO
-        {
-            AccountNumber = dto.AccountNumber,
-            Password = dto.Password
-        });
-
-        return Ok(new
-        {
-            message = "Registration successful",
-            token
-        });
+        return Ok(user);
     }
 
     // ---------------------------
