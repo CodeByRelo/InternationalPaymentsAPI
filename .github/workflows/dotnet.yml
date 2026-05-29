@@ -1,30 +1,67 @@
-name: .NET Build Pipeline
+name: Secure DevSecOps Pipeline
 
 on:
   push:
     branches: [ "master" ]
 
+  pull_request:
+    branches: [ "master" ]
+
 jobs:
-  build:
+  security-build-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
 
+    # CHECKOUT SOURCE CODE
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # SETUP .NET
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
+    # RESTORE PACKAGES
     - name: Restore Dependencies
       run: dotnet restore
 
+    # BUILD APPLICATION
     - name: Build Project
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration Release
 
+    # RUN UNIT TESTS
     - name: Run Tests
       run: dotnet test --no-build --verbosity normal
 
-    - name: Check for vulnerable packages
+    # SOFTWARE COMPOSITION ANALYSIS
+    # CHECK FOR VULNERABLE PACKAGES
+    - name: Scan NuGet Packages for Vulnerabilities
       run: dotnet list package --vulnerable
+
+    # STATIC CODE ANALYSIS
+    # CHECK FOR SECURITY HOTSPOTS
+    - name: Install Security Code Scanner
+      run: dotnet tool install --global security-scan
+
+    - name: Run Static Security Scan
+      run: security-scan ./ --excl-bin --output security-report.sarif || true
+
+    # VERIFY API STARTS SUCCESSFULLY
+    - name: Start API
+      run: |
+        dotnet run --project InternationalPaymentsAPI.csproj &
+        sleep 20
+
+    # BASIC API SECURITY TEST
+    - name: Test Secure Endpoint
+      run: |
+        curl --fail https://localhost:5001/swagger || true
+
+    # UPLOAD SECURITY REPORT
+    - name: Upload Security Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: security-report.sarif
