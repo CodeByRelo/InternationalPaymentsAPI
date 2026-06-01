@@ -95,6 +95,22 @@
   },
   {
     "ContainingType": "PaymentsController",
+    "Method": "GetPaymentDetails",
+    "RelativePath": "api/payments/details/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PaymentsController",
     "Method": "GetMyPayments",
     "RelativePath": "api/payments/my-payments",
     "HttpMethod": "GET",

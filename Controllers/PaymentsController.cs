@@ -28,7 +28,6 @@ public class PaymentsController : ControllerBase
 
         var userId = int.Parse(userIdClaim);
 
-        // VALIDATION
         if (!ValidationHelper.IsValidAmount(dto.Amount))
             return BadRequest("Invalid amount");
 
@@ -44,7 +43,6 @@ public class PaymentsController : ControllerBase
         if (!ValidationHelper.IsValidSwiftCode(dto.SwiftCode))
             return BadRequest("Invalid SWIFT code");
 
-        // CREATE PAYMENT
         var payment = new Payment
         {
             Amount = dto.Amount,
@@ -90,7 +88,7 @@ public class PaymentsController : ControllerBase
     }
 
     // =====================================================
-    // EMPLOYEE: VIEW ALL PAYMENTS (FOR TABS UI)
+    // EMPLOYEE: VIEW ALL PAYMENTS
     // =====================================================
     [HttpGet("all")]
     [Authorize(Roles = "Employee")]
@@ -104,7 +102,7 @@ public class PaymentsController : ControllerBase
     }
 
     // =====================================================
-    // EMPLOYEE: VIEW PENDING ONLY
+    // EMPLOYEE: VIEW PENDING
     // =====================================================
     [HttpGet("pending")]
     [Authorize(Roles = "Employee")]
@@ -119,7 +117,7 @@ public class PaymentsController : ControllerBase
     }
 
     // =====================================================
-    // EMPLOYEE: VIEW VERIFIED ONLY (NEW)
+    // EMPLOYEE: VIEW VERIFIED
     // =====================================================
     [HttpGet("verified")]
     [Authorize(Roles = "Employee")]
@@ -134,7 +132,7 @@ public class PaymentsController : ControllerBase
     }
 
     // =====================================================
-    // EMPLOYEE: VIEW COMPLETED ONLY (NEW)
+    // EMPLOYEE: VIEW COMPLETED
     // =====================================================
     [HttpGet("completed")]
     [Authorize(Roles = "Employee")]
@@ -193,5 +191,40 @@ public class PaymentsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Payment sent via SWIFT (simulated)" });
+    }
+
+    // =====================================================
+    // ⭐ NEW: PAYMENT DETAILS (SAFE ADDITION)
+    // =====================================================
+    [HttpGet("details/{id}")]
+    [Authorize(Roles = "Employee")]
+    public async Task<IActionResult> GetPaymentDetails(int id)
+    {
+        var payment = await _context.Payments
+            .Where(p => p.Id == id)
+            .Select(p => new
+            {
+                // PAYMENT INFO
+                p.Id,
+                p.Amount,
+                p.Currency,
+                p.Provider,
+                p.PayeeAccountNumber,
+                p.SwiftCode,
+                p.Status,
+                p.CreatedAt,
+
+                // CUSTOMER INFO (JOINED SAFELY)
+                CustomerId = p.CustomerId,
+                CustomerName = p.Customer.FullName,
+                CustomerAccountNumber = p.Customer.AccountNumber,
+                CustomerIdNumber = p.Customer.IdNumber
+            })
+            .FirstOrDefaultAsync();
+
+        if (payment == null)
+            return NotFound("Payment not found");
+
+        return Ok(payment);
     }
 }

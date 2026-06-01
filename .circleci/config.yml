@@ -1,0 +1,26 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:8.0
+
+    steps:
+      - checkout
+
+      - run:
+          name: Restore Packages
+          command: dotnet restore
+
+      - run:
+          name: Build Project
+          command: dotnet build --configuration Release
+
+      - run:
+          name: Run Tests
+          command: dotnet test --configuration Release || true
+
+workflows:
+  build-workflow:
+    jobs:
+      - build

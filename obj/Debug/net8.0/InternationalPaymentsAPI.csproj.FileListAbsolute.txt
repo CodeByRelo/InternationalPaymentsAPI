@@ -141,3 +141,4 @@ C:\Dev\InternationalPaymentsAPI\obj\Debug\net8.0\refint\InternationalPaymentsAPI
 C:\Dev\InternationalPaymentsAPI\obj\Debug\net8.0\InternationalPaymentsAPI.pdb
 C:\Dev\InternationalPaymentsAPI\obj\Debug\net8.0\InternationalPaymentsAPI.genruntimeconfig.cache
 C:\Dev\InternationalPaymentsAPI\obj\Debug\net8.0\ref\InternationalPaymentsAPI.dll
+C:\Dev\InternationalPaymentsAPI\obj\Debug\net8.0\InternationalPaymentsAPI.sourcelink.json
