@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+
 jobs:
   build:
     docker:
@@ -9,7 +12,7 @@ jobs:
       - checkout
 
       - run:
-          name: Restore Packages
+          name: Restore Dependencies
           command: dotnet restore
 
       - run:
@@ -20,7 +23,10 @@ jobs:
           name: Run Tests
           command: dotnet test --configuration Release || true
 
+      - sonarcloud/scan
+
 workflows:
-  build-workflow:
+  main:
     jobs:
-      - build
+      - build:
+          context: SonarCloud
