@@ -4,3 +4,5 @@
 
 /.vs/InternationalPaymentsAPI.slnx
 /.vs/ProjectEvaluation
+bin/
+obj/
